@@ -2,8 +2,8 @@ define unicorn::app (
   $approot,
   $pidfile,
   $socket,
-  $backlog         = hiera('unicorn_backlog'),
-  $workers         = hiera('unicorn_workers'),
+  $backlog         = 2048,
+  $workers         = $::processorcount,
   $user            = 'root',
   $group           = 'root',
   $config_file     = '',
@@ -14,6 +14,8 @@ define unicorn::app (
   $preload_app     = false,
   $source          = 'system',
 ) {
+
+  include unicorn::params
 
   # If we have been given a config path, use it, if not, make one up.
   # This _may_ not be the most secure, as it should live outside of
@@ -29,7 +31,7 @@ define unicorn::app (
   # XXX Debian Wheezy specific
   case $source {
     'system': {
-      $daemon = hiera('unicorn_executable')
+      $daemon = $::unicorn::params::unicorn_executable
       $daemon_opts = $unicorn_opts
     }
     'bundler': {
